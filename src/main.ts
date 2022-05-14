@@ -66,16 +66,16 @@ function init() {
     const x = Math.cos(angle) * r + center.x;
     const y = Math.sin(angle) * r + center.y;
 
-    const peg = Bodies.polygon(x, y, 1, 20);
+    const peg = Bodies.polygon(x, y, 1, 20, { friction: 0 });
     pegs.push(peg);
   }
 
   // Peg Paddler
   const rectWidth = 12;
-  const rectHeight = 80;
+  const rectHeight = 120;
   const paddleCenter = {
     x: center.x,
-    y: center.y - radius,
+    y: center.y - radius - rectHeight / 2 + 30,
   };
   const paddler = Bodies.rectangle(
     paddleCenter.x,
@@ -86,6 +86,7 @@ function init() {
       collisionFilter: {
         category: 1,
       },
+      friction: 0,
     }
   );
 
@@ -146,7 +147,7 @@ function init() {
   // TODO: Make the physics look cooler
   // Add the fly wheel and pegs
   const flyWheel = Bodies.polygon(center.x, center.y, 1, radius - 40, {
-    mass: 194.443899428
+    mass: 100,
   });
   console.log(flyWheel.mass);
   const wheelBody = Body.create({
