@@ -13,12 +13,12 @@ import Matter, {
 
 window.Matter = Matter;
 
-// const app = document.querySelector<HTMLDivElement>('#app')!
-
-// app.innerHTML = `
-//   <h1>Hello Vite!</h1>
-//   <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
-// `
+/**
+ * TOODs
+ * fix physics so it's not dependent on screen size
+ * render stuff with Three.js
+ * logic for figuring out what you picked
+ */
 
 const size = {
   width: document.documentElement.clientWidth,
@@ -149,7 +149,6 @@ function init() {
   const flyWheel = Bodies.polygon(center.x, center.y, 1, radius - 40, {
     mass: 100,
   });
-  console.log(flyWheel.mass);
   const wheelBody = Body.create({
     parts: [flyWheel, ...pegs],
   });
