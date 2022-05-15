@@ -9,7 +9,13 @@ window.Matter = Matter;
  * TOODs
  * fix physics so it's not dependent on screen size
  * render stuff with Three.js
+ * hook up physics
+ * motion blur?
+ * Add pegs
+ * add paddler
+ * Add text
  * logic for figuring out what you picked
+ *
  */
 
 // setupMatterjs();
