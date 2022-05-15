@@ -2,13 +2,12 @@ import Matter from "matter-js";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
-
+// @ts-ignore
+import { FlakesTexture } from "three/examples/jsm/textures/FlakesTexture";
 import wheelURL from "./assets/Wheel of Foodv1.stl?url";
-import aftLoungeTexture from './assets/aft_lounge_cube_map/texture';
-console.log(wheelURL);
+import aftLoungeTexture from "./assets/aft_lounge_cube_map/texture";
 import { setupMatterjs } from "./physics";
 import "./style.css";
-import texture from "./assets/aft_lounge_cube_map/texture";
 
 window.Matter = Matter;
 
@@ -23,7 +22,7 @@ window.Matter = Matter;
  * add paddler
  * Add text
  * logic for figuring out what you picked
- *
+ * Figure out uv mapping
  */
 
 // setupMatterjs();
@@ -36,27 +35,53 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  // alpha: true,
+});
+// Random stuff for ball to look better
+// renderer.outputEncoding = THREE.sRGBEncoding;
+// renderer.toneMapping = THREE.ACESFilmicToneMapping;
+// renderer.toneMappingExposure = 1.25;
+
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// GEOMETRY
-let wheel;
-const material = new THREE.MeshPhysicalMaterial({
-  color: "rgba(202,59,253,0.66)",
-  metalness: 0.15,
-  roughness: 0.15,
-  transmission: 0.2,
+// WHEEL
+let wheel:
+  | THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhysicalMaterial>
+  | undefined;
+
+let texture = new THREE.CanvasTexture(new FlakesTexture());
+texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+
+//repeat the wrapping 10 (x) and 6 (y) times
+texture.repeat.x = 10;
+texture.repeat.y = 6;
+
+const ballMaterial = {
   clearcoat: 1.0,
-  clearcoatRoughness: 0.25,
-});
+  cleacoatRoughness: 0.6,
+  metalness: 0.5,
+  roughness: 0.5,
+  color: 0x8418ca,
+  normalMap: texture,
+  normalScale: new THREE.Vector2(-1, -1),
+  // normalScale: new THREE.Vector2(0.15, 0.15),
+  // normalScale: new THREE.Vector2(10, 2),
+};
+
+//add material setting
+const material = new THREE.MeshPhysicalMaterial(ballMaterial);
+
 const loader = new STLLoader();
 loader.load(
   wheelURL,
   function (geometry) {
+    // TODO: Compute tangents so that sparckles work.
+    // geometry.computeTangents();
     const mesh = new THREE.Mesh(geometry, material);
-    var box = new THREE.Box3().setFromObject(mesh);
-    console.log(box);
     scene.add(mesh);
     wheel = mesh;
   },
@@ -83,17 +108,26 @@ scene.add(light);
 // TEXT
 // const text = new THREE.TextGeometry
 
-camera.position.z = 50;
+camera.position.z = 40;
+
+// ORBIT
+const controls = new OrbitControls(camera, renderer.domElement);
 
 function animate() {
   requestAnimationFrame(animate);
+  controls.update();
 
-  if (wheel) {
-    wheel.rotation.x += 0.01;
-    wheel.rotation.y += 0.01;
-    wheel.rotation.z += 0.005;
-  }
+  rotate(wheel);
+  // rotate(ballMesh);
 
   renderer.render(scene, camera);
 }
 animate();
+
+function rotate(thing: THREE.Mesh | undefined) {
+  if (thing) {
+    // thing.rotation.x += 0.01;
+    // thing.rotation.y += 0.012;
+    thing.rotation.z += 0.01;
+  }
+}
