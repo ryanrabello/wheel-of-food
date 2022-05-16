@@ -8,15 +8,14 @@ import wheelURL from "./assets/Wheel of Foodv1.stl?url";
 import aftLoungeTexture from "./assets/aft_lounge_cube_map/texture";
 import { setupMatterjs } from "./physics";
 import "./style.css";
+import {RectAreaLightHelper} from "three/examples/jsm/helpers/RectAreaLightHelper";
 
 window.Matter = Matter;
 
 /**
  * TOODs
- * fix physics so it's not dependent on screen size
- * Initial lighting
- * render stuff with Three.js
  * hook up physics
+ * fix physics so it's not dependent on screen size
  * motion blur?
  * Add pegs
  * add paddler
@@ -61,12 +60,13 @@ texture.repeat.x = 10;
 texture.repeat.y = 6;
 
 const ballMaterial = {
-  clearcoat: 1.0,
+  clearcoat: .4,
   cleacoatRoughness: 0.6,
   metalness: 0.5,
   roughness: 0.5,
   color: 0x8418ca,
-  normalMap: texture,
+  // color: 'white',
+  normalMap: texture, // Not used since there is no uv mapping
   normalScale: new THREE.Vector2(-1, -1),
   // normalScale: new THREE.Vector2(0.15, 0.15),
   // normalScale: new THREE.Vector2(10, 2),
@@ -93,7 +93,7 @@ loader.load(
   }
 );
 
-// LIGHT
+// Point LIGHT
 const pointLight = new THREE.PointLight("white", 1);
 pointLight.position.set(-15, 15, 15);
 scene.add(pointLight);
@@ -105,12 +105,29 @@ scene.add(pointLightHelper);
 const light = new THREE.AmbientLight(0x404040); // soft white light
 scene.add(light);
 
+// RECT LIGHT
+const rectLight = new THREE.RectAreaLight("#FF00FF", 20, 10, 10);
+rectLight.position.set(10, 20, 30);
+rectLight.lookAt( 0, 0, 0 );
+scene.add(rectLight);
+
+const rectLightHelper = new RectAreaLightHelper( rectLight );
+rectLight.add( rectLightHelper );
+
+// AMBIENT LIGHT
+// const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+// scene.add(ambientLight);
+
+
+
+
+
 // TEXT
 // const text = new THREE.TextGeometry
 
-camera.position.z = 40;
 
 // ORBIT
+camera.position.z = 40;
 const controls = new OrbitControls(camera, renderer.domElement);
 
 function animate() {
